@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Analyzer -  Facial Stress Assessment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚕️ Stress Analyzer</h1>
+            <p class="subtitle"> Facial Stress Assessment using FACS Analysis</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel: Image Display -->
+            <div class="left-panel">
+                <div class="image-container" id="imageContainer">
+                    <div class="placeholder" id="placeholder">
+                        <div class="placeholder-icon">📷</div>
+                        <p>No image loaded</p>
+                        <p class="placeholder-hint">Upload an image or capture from camera</p>
+                    </div>
+                    <img id="previewImage" class="preview-image" style="display: none;" alt="Preview">
+                    <video id="cameraVideo" class="camera-video" autoplay playsinline style="display: none;"></video>
+                    <canvas id="captureCanvas" style="display: none;"></canvas>
+                </div>
+
+                <div class="camera-controls" id="cameraControls" style="display: none;">
+                    <button class="btn btn-success" id="takePhotoBtn">
+                        <span class="btn-icon">📸</span> Take Photo
+                    </button>
+                    <button class="btn btn-secondary" id="cancelCameraBtn">
+                        <span class="btn-icon">✖</span> Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Controls and Results -->
+            <div class="right-panel">
+                <div class="controls-section">
+                    <h2>Controls</h2>
+                    
+                    <button class="btn btn-primary" id="uploadBtn" onclick="document.getElementById('fileInput').click()">
+                        <span class="btn-icon">📁</span> Upload Image
+                    </button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+                    <button class="btn btn-primary" id="cameraBtn">
+                        <span class="btn-icon">📷</span> Capture from Camera
+                    </button>
+
+                    <button class="btn btn-accent" id="analyzeBtn" disabled>
+                        <span class="btn-icon">🔍</span> Analyze Current Image
+                    </button>
+                </div>
+
+                <div class="results-section">
+                    <h2>Results</h2>
+                    
+                    <div class="score-display" id="scoreDisplay">
+                        <div class="score-label">Stress Score</div>
+                        <div class="score-value" id="scoreValue">-</div>
+                        <div class="score-max">/ 10</div>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+
+                    <div class="interpretation" id="interpretation">
+                        <strong>Interpretation:</strong>
+                        <p id="interpretationText">No analysis performed yet</p>
+                    </div>
+
+                    <div class="au-values" id="auValues">
+                        <h3>Action Unit Values</h3>
+                        <div class="au-list" id="auList">
+                            <p class="au-placeholder">Perform analysis to see Action Unit metrics</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% if not model_loaded %}
+                <div class="alert alert-error">
+                    <strong>⚠️ Model Not Loaded</strong>
+                    <p>The facial landmark model (shape_predictor_68_face_landmarks.dat) is not available. Please place it in the webapp folder.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <footer>
+            <p>Clinical Stress Analysis System | © 2025 Healthcare Technology</p>
+            <p class="footer-note">Evidence-based assessment using Facial Action Coding System (FACS)</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Analyzing image...</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+

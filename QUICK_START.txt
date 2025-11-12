@@ -1,0 +1,190 @@
+================================================================================
+                STRESS ANALYZER WEB APPLICATION - QUICK START
+================================================================================
+
+Follow these simple steps to get started:
+
+STEP 1: DOWNLOAD THE MODEL FILE (Required - One Time Setup)
+------------------------------------------------------------
+
+The facial landmark model file is required but not included due to size.
+
+1. Download from: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+2. Extract the .bz2 file (use 7-Zip, WinRAR, or built-in extractor)
+3. Place "shape_predictor_68_face_landmarks.dat" in the "webapp" folder
+4. File size should be about 99 MB
+
+
+STEP 2: RUN THE APPLICATION
+----------------------------
+
+OPTION A - Windows (Easiest):
+  1. Double-click "RUN_WEBAPP.bat"
+  2. Wait for server to start
+  3. Browser will show: http://localhost:5000
+
+OPTION B - Manual:
+  1. Open terminal/command prompt
+  2. Navigate to webapp folder: cd webapp
+  3. Install packages: pip install -r requirements.txt
+  4. Run: python app.py
+  5. Open browser to: http://localhost:5000
+
+
+STEP 3: USE THE APPLICATION
+----------------------------
+
+1. You'll see a modern web interface
+2. Choose one option:
+   
+   UPLOAD IMAGE:
+     - Click "Upload Image"
+     - Select a photo with a clear face
+     - Image appears in display area
+   
+   OR
+   
+   USE CAMERA:
+     - Click "Capture from Camera"
+     - Allow camera access when prompted
+     - Position face in frame
+     - Click "Take Photo"
+
+3. Click "Analyze Current Image"
+4. Results appear in 1-2 seconds:
+   - Stress score (0-10)
+   - Interpretation
+   - Action Unit metrics
+
+
+ACCESS FROM OTHER DEVICES (Optional)
+-------------------------------------
+
+Want to use from your phone or another computer?
+
+1. Find your computer's IP address:
+   - Windows: Open cmd, type: ipconfig
+   - Look for "IPv4 Address" (e.g., 192.168.1.100)
+
+2. On other device (same WiFi network):
+   - Open browser
+   - Go to: http://YOUR_IP:5000
+   - Example: http://192.168.1.100:5000
+
+
+TROUBLESHOOTING
+---------------
+
+Problem: "Model file not found" error
+Solution: Complete STEP 1 above
+
+Problem: Port 5000 already in use
+Solution: Edit app.py, change port number (line ~280)
+
+Problem: Camera not working in browser
+Solution: 
+  - Ensure camera permissions are enabled
+  - Use Chrome or Firefox (recommended)
+  - Camera only works on localhost or HTTPS
+
+Problem: Can't install dlib
+Solution (Windows):
+  pip install cmake
+  pip install dlib
+
+Problem: No face detected
+Solution:
+  - Use good lighting
+  - Face should be front-facing
+  - Move closer to camera
+  - Remove sunglasses/masks
+
+
+TIPS FOR BEST RESULTS
+----------------------
+
+✓ Use good, even lighting
+✓ Face directly facing camera
+✓ Remove obstructions (glasses OK, sunglasses not OK)
+✓ Neutral expression works best
+✓ Face should fill ~50% of frame
+✓ Use JPG or PNG images
+✓ Image size under 16 MB
+
+
+FEATURES
+--------
+
+✓ Modern, responsive web interface
+✓ Works on desktop and mobile browsers
+✓ Real-time camera capture
+✓ Image upload support
+✓ Detailed stress analysis (0-10 scale)
+✓ Professional stress interpretation
+✓ Complete Action Unit metrics
+✓ No installation needed (just Python)
+✓ Access from any device on your network
+
+
+WHAT'S INCLUDED
+---------------
+
+webapp/
+  - app.py (Flask backend)
+  - templates/index.html (web interface)
+  - static/css/style.css (styling)
+  - static/js/app.js (interactivity)
+  - requirements.txt (dependencies)
+  - RUN_WEBAPP.bat (launcher)
+  - README.md (full documentation)
+
+
+SYSTEM REQUIREMENTS
+-------------------
+
+- Python 3.7 or higher
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+- Webcam (optional, for camera feature)
+- 4 GB RAM minimum
+- Internet connection (for initial package installation)
+
+
+SECURITY & PRIVACY
+------------------
+
+✓ All processing happens locally on your computer
+✓ No data sent to external servers
+✓ Images not saved after analysis
+✓ Works completely offline (after installation)
+✓ Open source - you can review all code
+
+
+NEXT STEPS
+----------
+
+- Read full README.md for advanced features
+- Customize colors in static/css/style.css
+- Deploy to cloud for public access
+- Add authentication for multi-user scenarios
+- Integrate with other applications via API
+
+
+NEED HELP?
+----------
+
+1. Check README.md for detailed documentation
+2. Review troubleshooting section above
+3. Check browser console (F12) for errors
+4. Check terminal/console for backend errors
+
+
+================================================================================
+                        ENJOY YOUR WEB APPLICATION!
+================================================================================
+
+Access at: http://localhost:5000
+
+Press Ctrl+C in the terminal to stop the server
+
+© 2025 Stress Analyzer Web Application
+
