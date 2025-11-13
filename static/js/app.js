@@ -118,7 +118,14 @@ function capturePhoto() {
 
     // Draw current video frame to canvas
     const ctx = captureCanvas.getContext('2d');
+    
+    // Flip the image back to correct orientation (video is mirrored for preview)
+    ctx.translate(captureCanvas.width, 0);
+    ctx.scale(-1, 1);
     ctx.drawImage(cameraVideo, 0, 0);
+    
+    // Reset transformation
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     // Get image data
     const imageDataUrl = captureCanvas.toDataURL('image/jpeg', 0.95);
