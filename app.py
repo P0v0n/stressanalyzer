@@ -15,7 +15,7 @@ import io
 from PIL import Image
 from dotenv import load_dotenv
 
-from db import get_patient_collection
+from db import get_patient_collection, get_results_collection
 
 # Load environment variables from .env file (if exists)
 load_dotenv()
@@ -206,8 +206,12 @@ def analyze():
             return jsonify({'success': False, 'error': 'Failed to decode image'}), 400
 
         patient_id = _extract_patient_id()
+        patient_collection = None
+        results_collection = None
+
         if patient_id:
             patient_collection = get_patient_collection()
+            results_collection = get_results_collection()
             if patient_collection is None:
                 return jsonify({
                     'success': False,
@@ -246,6 +250,22 @@ def analyze():
 
         if patient_id:
             response_payload['patientid'] = patient_id
+
+            result_entry = {
+                'patientid': patient_id,
+                'score': score,
+                'interpretation': interpretation,
+                'au_values': au_display,
+                'created_at': datetime.utcnow()
+            }
+
+            if results_collection:
+                results_collection.insert_one(result_entry)
+
+            patient_collection.update_one(
+                {'patientid': patient_id},
+                {'$push': {'results': result_entry}}
+            )
 
         return jsonify(response_payload)
 

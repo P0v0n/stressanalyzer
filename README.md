@@ -126,12 +126,16 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB (change as needed)
 ```
 
 ### Enable MongoDB Patient Tracking (optional)
-Set the following environment variables (see `env.example`) to let the API store patient IDs:
+Set the following environment variables (see `env.example`) to let the API store patient IDs and their test history:
 - `MONGODB_URI` – full Mongo connection string
 - `MONGO_DB` – database name (e.g., `stress_analyzer`)
 - `PATIENTS_COLLECTION` – collection to store patient documents (e.g., `patients`)
+- `RESULTS_COLLECTION` – collection to store stress analysis results (e.g., `stress_results`)
 
-When configured, every `/analyze` call that includes `patientid` will ensure that ID exists in MongoDB before running the analysis.
+When configured, every `/analyze` call that includes `patientid` will:
+1. Ensure the patient record exists in `PATIENTS_COLLECTION`
+2. Append the analysis entry to the patient's `results` array
+3. Insert a standalone document into `RESULTS_COLLECTION` containing `patientid`, `score`, `interpretation`, `au_values`, and `created_at`
 
 ## 🌐 Network Access
 
@@ -333,6 +337,10 @@ Max upload size: 16 MB. Either `image` or `imageData` is required.
   "patientid": "PT-001"
 }
 ```
+
+**MongoDB Storage**
+- `PATIENTS_COLLECTION`: `{ "patientid": "PT-001", "created_at": ISODate(...), "results": [{ "score": 4.25, "interpretation": "...", "au_values": {...}, "created_at": ISODate(...) }, ...] }`
+- `RESULTS_COLLECTION`: `{ "patientid": "PT-001", "score": 4.25, "interpretation": "...", "au_values": {...}, "created_at": ISODate(...) }`
 
 ### `GET /health`
 Health check endpoint

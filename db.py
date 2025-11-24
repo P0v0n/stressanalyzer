@@ -16,13 +16,16 @@ def _mongo_config() -> Optional[dict]:
     db_name = os.environ.get('MONGO_DB')
     collection = os.environ.get('PATIENTS_COLLECTION')
 
-    if not (uri and db_name and collection):
+    results_collection = os.environ.get('RESULTS_COLLECTION')
+
+    if not (uri and db_name):
         return None
 
     return {
         'uri': uri,
         'db_name': db_name,
-        'collection': collection
+        'patients_collection': collection,
+        'results_collection': results_collection
     }
 
 
@@ -48,8 +51,19 @@ def get_patient_collection() -> Optional[Collection]:
     config = _mongo_config()
     client = get_mongo_client()
 
-    if not (config and client):
+    if not (config and client and config.get('patients_collection')):
         return None
 
-    return client[config['db_name']][config['collection']]
+    return client[config['db_name']][config['patients_collection']]
+
+
+def get_results_collection() -> Optional[Collection]:
+    """Get the results collection if configured."""
+    config = _mongo_config()
+    client = get_mongo_client()
+
+    if not (config and client and config.get('results_collection')):
+        return None
+
+    return client[config['db_name']][config['results_collection']]
 
