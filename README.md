@@ -125,6 +125,14 @@ Edit `app.py` (line ~18):
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB (change as needed)
 ```
 
+### Enable MongoDB Patient Tracking (optional)
+Set the following environment variables (see `env.example`) to let the API store patient IDs:
+- `MONGODB_URI` – full Mongo connection string
+- `MONGO_DB` – database name (e.g., `stress_analyzer`)
+- `PATIENTS_COLLECTION` – collection to store patient documents (e.g., `patients`)
+
+When configured, every `/analyze` call that includes `patientid` will ensure that ID exists in MongoDB before running the analysis.
+
 ## 🌐 Network Access
 
 ### Access from Other Devices
@@ -289,17 +297,31 @@ Main application page
 ### `POST /analyze`
 Analyze uploaded or captured image
 
-**Request** (multipart/form-data):
-```
-image: <file>
-```
+**Payload Options**
+- Multipart/form-data: `image=<binary file>`, optional `patientid=<string>`
+- JSON: 
+  ```json
+  {
+    "imageData": "data:image/jpeg;base64,...",
+    "patientid": "ABC123"   // optional
+  }
+  ```
 
-**Request** (JSON):
-```json
-{
-  "imageData": "data:image/jpeg;base64,..."
-}
-```
+Max upload size: 16 MB. Either `image` or `imageData` is required.
+
+**Sample Requests**
+- Multipart file upload:
+  ```bash
+  curl -X POST https://stressanalyzer.amaruventures.in/analyze \
+       -F "image=@/path/to/photo.jpg" \
+       -F "patientid=PT-001"
+  ```
+- JSON base64 payload:
+  ```bash
+  curl -X POST https://stressanalyzer.amaruventures.in/analyze \
+       -H "Content-Type: application/json" \
+       -d '{ "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...", "patientid": "PT-001" }'
+  ```
 
 **Response**:
 ```json
@@ -307,11 +329,8 @@ image: <file>
   "success": true,
   "score": 4.25,
   "interpretation": "Low Stress — Slight muscle activation...",
-  "au_values": {
-    "AU4": 0.0823,
-    "AU5": 0.0651,
-    ...
-  }
+  "au_values": { "AU4": 0.0823, "AU5": 0.0651, "...": 0.0 },
+  "patientid": "PT-001"
 }
 ```
 

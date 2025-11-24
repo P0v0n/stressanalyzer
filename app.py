@@ -4,6 +4,8 @@ Flask-based web interface for facial stress detection
 """
 import os
 import base64
+from datetime import datetime
+
 import cv2
 import dlib
 import numpy as np
@@ -12,6 +14,8 @@ from werkzeug.utils import secure_filename
 import io
 from PIL import Image
 from dotenv import load_dotenv
+
+from db import get_patient_collection
 
 # Load environment variables from .env file (if exists)
 load_dotenv()
@@ -152,6 +156,20 @@ def index():
     return render_template('index.html', model_loaded=model_loaded)
 
 
+def _extract_patient_id():
+    """Extract patient ID from either JSON or form submissions."""
+    json_payload = request.get_json(silent=True) or {}
+
+    patient_id = (
+        request.form.get('patientid')
+        or request.form.get('patientId')
+        or json_payload.get('patientid')
+        or json_payload.get('patientId')
+    )
+
+    return patient_id.strip() if isinstance(patient_id, str) else None
+
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     """Analyze uploaded or captured image"""
@@ -162,28 +180,46 @@ def analyze():
         }), 500
 
     try:
+        json_payload = request.get_json(silent=True) or {}
+
         # Get image from request
         if 'image' in request.files:
             # File upload
             file = request.files['image']
             if file.filename == '':
                 return jsonify({'success': False, 'error': 'No file selected'}), 400
-            
+
             # Read image
             img_bytes = file.read()
             img_array = np.frombuffer(img_bytes, dtype=np.uint8)
             img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-            
-        elif 'imageData' in request.json:
+
+        elif 'imageData' in json_payload:
             # Base64 image data (from camera)
-            base64_data = request.json['imageData']
+            base64_data = json_payload['imageData']
             img = decode_base64_image(base64_data)
-            
+
         else:
             return jsonify({'success': False, 'error': 'No image provided'}), 400
 
         if img is None:
             return jsonify({'success': False, 'error': 'Failed to decode image'}), 400
+
+        patient_id = _extract_patient_id()
+        if patient_id:
+            patient_collection = get_patient_collection()
+            if patient_collection is None:
+                return jsonify({
+                    'success': False,
+                    'error': 'patientid provided but MongoDB is not configured. Please set MONGODB_URI, MONGO_DB, and PATIENTS_COLLECTION.'
+                }), 500
+
+            existing_patient = patient_collection.find_one({'patientid': patient_id})
+            if not existing_patient:
+                patient_collection.insert_one({
+                    'patientid': patient_id,
+                    'created_at': datetime.utcnow()
+                })
 
         # Get landmarks
         landmarks = get_landmarks_from_frame(img)
@@ -201,12 +237,17 @@ def analyze():
         # Format AU values for display
         au_display = {au: round(value, 4) for au, value in au_values.items()}
 
-        return jsonify({
+        response_payload = {
             'success': True,
             'score': score,
             'interpretation': interpretation,
             'au_values': au_display
-        })
+        }
+
+        if patient_id:
+            response_payload['patientid'] = patient_id
+
+        return jsonify(response_payload)
 
     except Exception as e:
         return jsonify({
